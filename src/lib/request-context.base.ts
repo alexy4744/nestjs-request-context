@@ -7,13 +7,7 @@ export abstract class RequestContext {
     return RequestContext.als.enterWith(new constructor());
   }
 
-  static get<T extends RequestContext>(): T {
-    const store = RequestContext.als.getStore() as T | undefined;
-
-    if (!store) {
-      throw new Error("request context must be entered before retrieving the store");
-    }
-
-    return store;
+  static get<T extends RequestContext>(): T | undefined {
+    return RequestContext.als.getStore() as T | undefined;
   }
 }
