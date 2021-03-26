@@ -1,4 +1,4 @@
-import { HttpStatus, INestApplication } from "@nestjs/common";
+import { INestApplication } from "@nestjs/common";
 import { Test } from "@nestjs/testing";
 
 import { Server } from "http";
@@ -25,10 +25,7 @@ describe("RequestContext", () => {
   afterEach(() => app.close());
 
   it("should set the data in request context", async () => {
-    const response = await request(server)
-      .post("/")
-      .query({ data: "test" })
-      .expect(HttpStatus.CREATED);
+    const response = await request(server).post("/").query({ data: "test" });
 
     expect(response.body).toEqual(
       expect.objectContaining({
@@ -38,7 +35,7 @@ describe("RequestContext", () => {
   });
 
   it("should use the overriden request context", async () => {
-    const response = await request(server).get("/").expect(HttpStatus.OK);
+    const response = await request(server).get("/");
 
     expect(response.body).toEqual(
       expect.objectContaining({

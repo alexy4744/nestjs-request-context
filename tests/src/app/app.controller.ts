@@ -9,7 +9,7 @@ import { CustomRequestContext } from "./custom.context";
 export class AppController {
   @Post()
   set(@Query("data") data: string): AppRequestContext {
-    const store = AppRequestContext.get<AppRequestContext>();
+    const store = AppRequestContext.get<AppRequestContext>() as AppRequestContext;
 
     store.data = data;
 
@@ -19,6 +19,6 @@ export class AppController {
   @Get()
   @UseInterceptors(RequestContextInterceptor(CustomRequestContext))
   get(): CustomRequestContext {
-    return CustomRequestContext.get<CustomRequestContext>();
+    return CustomRequestContext.get<CustomRequestContext>() as CustomRequestContext;
   }
 }
