@@ -1,6 +1,6 @@
 {
   "name": "@quicksend/nestjs-request-context",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "Keep track of request-level data in NestJS using AsyncLocalStorage",
   "files": [
     "dist/**/*"
