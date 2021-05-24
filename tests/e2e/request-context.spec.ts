@@ -33,14 +33,4 @@ describe("RequestContext", () => {
       })
     );
   });
-
-  it("should use the overriden request context", async () => {
-    const response = await request(server).get("/");
-
-    expect(response.body).toEqual(
-      expect.objectContaining({
-        custom: true
-      })
-    );
-  });
 });

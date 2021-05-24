@@ -30,7 +30,7 @@ Next, register the `RequestContextModule` in your application with your context 
 
 ```ts
 import { Module } from "@nestjs/core";
-import { RequestContextModule } from "@quicksend/nestjs-transmit";
+import { RequestContextModule } from "@quicksend/nestjs-request-context";
 
 import { RequestContext } from "./request.context";
 

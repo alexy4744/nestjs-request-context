@@ -1,23 +1,23 @@
-import { APP_INTERCEPTOR } from "@nestjs/core";
-import { Module } from "@nestjs/common";
+import { MiddlewareConsumer, Module, NestModule, RequestMethod } from "@nestjs/common";
 
 import { AppController } from "./app.controller";
 import { AppRequestContext } from "./app.context";
 
-import { RequestContextModule, RequestContextInterceptor } from "../../../src";
+import { RequestContextModule, RequestContextMiddleware } from "../../../src";
 
 @Module({
   imports: [
-    RequestContextModule.register({
+    RequestContextModule.forRoot({
       context: AppRequestContext
     })
   ],
-  controllers: [AppController],
-  providers: [
-    {
-      provide: APP_INTERCEPTOR,
-      useClass: RequestContextInterceptor()
-    }
-  ]
+  controllers: [AppController]
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer): void {
+    consumer.apply(RequestContextMiddleware()).forRoutes({
+      method: RequestMethod.ALL,
+      path: "*"
+    });
+  }
+}
