@@ -25,51 +25,31 @@ export class RequestContext extends BaseRequestContext {
 }
 ```
 
-### RequestContextModule
-Next, register the `RequestContextModule` in your application with your context class:
+### RequestContextMiddleware
+
+Next, register the `RequestContextModule` in your application and use the middleware:
 
 ```ts
-import { Module } from "@nestjs/core";
-import { RequestContextModule } from "@quicksend/nestjs-request-context";
+import { MiddlewareConsumer, Module, NestModule, RequestMethod } from "@nestjs/common";
+import { RequestContextModule, RequestContextMiddleware } from "@quicksend/nestjs-request-context";
 
 import { RequestContext } from "./request.context";
 
 @Module({
   imports: [
-    RequestContextModule.register({
+    RequestContextModule.forRoot({
       context: RequestContext
     })
   ]
 })
-export class AppModule {}
-```
-
-### RequestContextInterceptor
-
-Once `RequestContextModule` is registered, you can now use `RequestContextInterceptor` in your application to persist request-level data.
-
-```ts
-import { APP_INTERCEPTOR } from "@nestjs/core";
-import { Module } from "@nestjs/core";
-
-import { RequestContextModule, RequestContextInterceptor } from "@quicksend/nestjs-request-context";
-
-import { RequestContext } from "./request.context";
-
-@Module({
-  imports: [
-    RequestContextModule.register({
-      context: RequestContext
-    })
-  ],
-  providers: [
-    {
-      provide: APP_INTERCEPTOR,
-      useClass: RequestContextInterceptor()
-    }
-  ]
-})
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer): void {
+    consumer.apply(RequestContextMiddleware()).forRoutes({
+      method: RequestMethod.ALL,
+      path: "*"
+    });
+  }
+}
 ```
 
 You can now access the request context from anywhere in your application.
@@ -88,25 +68,6 @@ export class AppController {
     store.data = "test";
 
     return store;
-  }
-}
-```
-
-You can also override the request context class for a specific endpoint or endpoints by passing in a different context class to the interceptor.
-
-```ts
-import { Controller, Get, UseInterceptors } from "@nestjs/common";
-
-import { RequestContextInterceptor } from "@quicksend/nestjs-request-context";
-
-import { CustomRequestContext } from "./custom.context";
-
-@Controller()
-export class AppController {
-  @Get()
-  @UseInterceptors(RequestContextInterceptor(CustomRequestContext))
-  get(): CustomRequestContext {
-    return CustomRequestContext.get<CustomRequestContext>();
   }
 }
 ```
