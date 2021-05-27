@@ -3,7 +3,7 @@
 Keep track of request-level data in NestJS using AsyncLocalStorage
 
 ## Prerequisites
- - [Node.js](https://nodejs.org/en/) >= 15.9.0 (to be changed once async_hooks becomes stable in Node.js v16)
+ - [Node.js](https://nodejs.org/en/) >= 16.0.0
 
 ## Installation
 
@@ -20,31 +20,26 @@ First, create a class that extends `RequestContext`. This class will hold your r
 ```ts
 import { RequestContext as BaseRequestContext } from "@quicksend/nestjs-request-context";
 
-export class RequestContext extends BaseRequestContext {
+export class RequestContext extends BaseRequestContext<RequestContext>() {
   data?: string;
 }
 ```
 
 ### RequestContextMiddleware
 
-Next, register the `RequestContextModule` in your application and use the middleware:
+Next, apply `RequestContextMiddleware` as a global middleware and pass in our request context as a parameter:
 
 ```ts
 import { MiddlewareConsumer, Module, NestModule, RequestMethod } from "@nestjs/common";
-import { RequestContextModule, RequestContextMiddleware } from "@quicksend/nestjs-request-context";
+
+import { RequestContextMiddleware } from "@quicksend/nestjs-request-context";
 
 import { RequestContext } from "./request.context";
 
-@Module({
-  imports: [
-    RequestContextModule.forRoot({
-      context: RequestContext
-    })
-  ]
-})
+@Module()
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer): void {
-    consumer.apply(RequestContextMiddleware()).forRoutes({
+    consumer.apply(RequestContextMiddleware(RequestContext)).forRoutes({
       method: RequestMethod.ALL,
       path: "*"
     });
@@ -63,9 +58,13 @@ import { RequestContext } from "./request.context";
 export class AppController {
   @Get()
   get(): RequestContext {
-    const store = RequestContext.get<RequestContext>();
+    const store = RequestContext.getStore();
 
     store.data = "test";
+
+    const data = RequestContext.getItem("data");
+    
+    console.log(item); // "test"
 
     return store;
   }
