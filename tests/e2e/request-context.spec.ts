@@ -24,8 +24,18 @@ describe("RequestContext", () => {
 
   afterEach(() => app.close());
 
-  it("should set the data in request context", async () => {
-    const response = await request(server).post("/").query({ data: "test" });
+  it("should set the data in request context with interceptor", async () => {
+    const response = await request(server).post("/interceptor").query({ data: "test" });
+
+    expect(response.body).toEqual(
+      expect.objectContaining({
+        data: "test"
+      })
+    );
+  });
+
+  it("should set the data in request context with middleware", async () => {
+    const response = await request(server).post("/middleware").query({ data: "test" });
 
     expect(response.body).toEqual(
       expect.objectContaining({

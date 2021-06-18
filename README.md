@@ -71,6 +71,35 @@ export class AppController {
 }
 ```
 
+### RequestContextInterceptor
+
+For use cases where a middleware is not appropriate (i.e. NestJS microservices), you can use the `RequestContextInterceptor`. It can be applied normally like any other interceptor. Note that interceptors run after guards, refer to the request lifecycle [here](https://docs.nestjs.com/faq/request-lifecycle#summary).
+
+```ts
+import { Controller, Post, Query, UseInterceptors } from "@nestjs/common";
+
+import { RequestContextInterceptor } from "@quicksend/nestjs-request-context";
+
+import { RequestContext } from "./request.context";
+
+@Controller()
+export class AppController {
+  @Get()
+  @UseInterceptors(RequestContextInterceptor(RequestContext))
+  get(): RequestContext | undefined {
+    const store = RequestContext.getStore();
+
+    store.data = "test";
+
+    const data = RequestContext.getItem("data");
+    
+    console.log(item); // "test"
+
+    return store;
+  }
+}
+```
+
 ## Tests
 
 Run tests using the following commands:
